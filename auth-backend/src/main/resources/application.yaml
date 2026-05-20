@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: auth-backend
+  profiles:
+    active: dev
+
+    
+
+server:
+  port: 8082
+
+#database configuration
+
+#mysql configuration
+
+
+

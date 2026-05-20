@@ -1,0 +1,82 @@
+#development version of configuration
+server:
+  port: 8083
+
+
+#database configuration
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/auth_app
+    username: root
+    password: Mohak@01   
+
+    # hikari:
+    #   pool-name: HikariCP
+    #   maximum-pool-size: 10
+    #   connection-timeout: 30000
+    #   idle-timeout: 600000
+    #   max-lifetime: 1800000
+    #   validation-timeout: 5000
+    #   leak-detection-threshold: 0
+    #   initialization-fail-timeout: -1
+
+
+
+# jpa and hibernate configuration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+        hibernate:
+            dialect: org.hibernate.dialect.MySQLDialect
+            "[format_sql]": true
+    show-sql: true
+  security:
+  # oauth2 configuration
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            # /login/oauth2/code/google
+            scope:
+            - email
+            - profile
+            - openid
+          github:
+            client-id: ${GITHUB_CLIENT_ID:Ov23liIHzYaM6EZp8s4j}
+            client-secret: ${GITHUB_CLIENT_SECRET:40d5c34031944b74dda2b4df0c6a416f5e2755c6}
+            # /login/oauth2/code/github
+            scope:
+            - user:email
+            - read:user
+   
+    
+
+logging:
+  level:
+    '[org.springframework.security]': DEBUG
+
+
+security:
+  jwt:
+    secret: ${JWT_SECRET:1234567890123456789012345678901234567890123456789012345678901234}
+    issuer: ${JWT_ISSUER:api.auth.backend.com}
+    access-ttl-seconds: ${JWT_ACCESS_TTL_SECONDS:600}
+    refresh-ttl-seconds: ${JWT_REFRESH_TTL_SECONDS:86400}
+    refresh-token-cookie-name: ${JWT_REFRESH_COOKIE_NAME:refreshToken}
+    cookie-secure: ${JWT_COOKIE_SECURE:true}
+    cookie-http-only: ${JWT_COOKIE_HTTP_ONLY:true}
+    cookie-same-site: ${JWT_COOKIE_SAME_SITE:lax}
+    cookie-domain: ${JWT_COOKIE_DOMAIN:localhost}
+
+
+app:
+  cors:
+    front-end-url: http://localhost:5173
+  auth:
+    frontend:
+      success-redirect: http://localhost:5173/auth/success
+      failure-redirect: http://localhost:5173/auth/failure
+
