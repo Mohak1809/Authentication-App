@@ -8,7 +8,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/auth_app
     username: root
-    password: Mohak@01   
+    password: ${DB_PASSWORD}   
 
     # hikari:
     #   pool-name: HikariCP
@@ -45,8 +45,8 @@ spring:
             - profile
             - openid
           github:
-            client-id: ${GITHUB_CLIENT_ID:Ov23liIHzYaM6EZp8s4j}
-            client-secret: ${GITHUB_CLIENT_SECRET:40d5c34031944b74dda2b4df0c6a416f5e2755c6}
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
             # /login/oauth2/code/github
             scope:
             - user:email
@@ -61,7 +61,7 @@ logging:
 
 security:
   jwt:
-    secret: ${JWT_SECRET:1234567890123456789012345678901234567890123456789012345678901234}
+    secret: ${JWT_SECRET}
     issuer: ${JWT_ISSUER:api.auth.backend.com}
     access-ttl-seconds: ${JWT_ACCESS_TTL_SECONDS:600}
     refresh-ttl-seconds: ${JWT_REFRESH_TTL_SECONDS:86400}

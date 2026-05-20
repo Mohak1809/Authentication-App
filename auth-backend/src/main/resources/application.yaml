@@ -3,6 +3,8 @@ spring:
     name: auth-backend
   profiles:
     active: dev
+  config:
+    import: optional:file:./auth-backend/.env[.properties]
 
     
 
