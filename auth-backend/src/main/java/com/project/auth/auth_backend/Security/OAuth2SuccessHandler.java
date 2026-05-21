@@ -2,6 +2,7 @@ package com.project.auth.auth_backend.Security;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -13,10 +14,13 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import com.project.auth.auth_backend.config.AppConstants;
 import com.project.auth.auth_backend.entities.Provider;
 import com.project.auth.auth_backend.entities.RefreshToken;
+import com.project.auth.auth_backend.entities.Role;
 import com.project.auth.auth_backend.entities.User;
 import com.project.auth.auth_backend.repositories.RefreshTokenRepository;
+import com.project.auth.auth_backend.repositories.RoleRepository;
 import com.project.auth.auth_backend.repositories.UserRepository;
 
 import jakarta.servlet.ServletException;
@@ -30,6 +34,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final JwtService jwtService;
     private final CookieService cookieService;
     private final RefreshTokenRepository refreshTokenRepository;
@@ -79,6 +84,11 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                                     .provider(Provider.GOOGLE)
                                     .providerId(googleId)
                                     .build();
+                            if (newUser.getRoles() == null) {
+                                newUser.setRoles(new HashSet<>());
+                            }
+                            Role role = roleRepository.findByName("ROLE_" + AppConstants.Role_GUEST).orElse(null);
+                            newUser.getRoles().add(role);
 
                             logger.info("Saving new user");
 
@@ -103,6 +113,11 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                         .provider(Provider.GITHUB)
                         .providerId(githubId)
                         .build();
+                if (newUser.getRoles() == null) {
+                    newUser.setRoles(new HashSet<>());
+                }
+                Role role = roleRepository.findByName("ROLE_" + AppConstants.Role_GUEST).orElse(null);
+                newUser.getRoles().add(role);
                 user = userRepository.findByEmail(email).orElseGet(() -> userRepository.save(newUser));
 
                 break;

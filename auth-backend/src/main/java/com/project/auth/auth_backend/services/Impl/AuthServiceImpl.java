@@ -3,7 +3,9 @@ package com.project.auth.auth_backend.services.Impl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.project.auth.auth_backend.config.AppConstants;
 import com.project.auth.auth_backend.dtos.UserDto;
+import com.project.auth.auth_backend.repositories.RoleRepository;
 import com.project.auth.auth_backend.services.AuthService;
 
 import lombok.AllArgsConstructor;
@@ -17,10 +19,15 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public UserDto registerUser(UserDto userDto) {
- 
+
         // verify email and password
         userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
         return userService.createUser(userDto);
+    }
+    
+    public UserDto registerAdmin(UserDto userDto) {
+        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        return userService.createAdmin(userDto);
     }
 
 }

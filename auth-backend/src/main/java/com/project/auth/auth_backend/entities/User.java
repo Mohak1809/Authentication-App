@@ -30,15 +30,20 @@ public class User implements UserDetails {
     private String name;
     private String password;
     private String image;
-    private Boolean enable = true;
+    @Builder.Default
+    private boolean enable = true;
+    @Builder.Default
     private Instant createdAt = Instant.now();
+    @Builder.Default
     private Instant updatedAt = Instant.now();
 
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private Provider provider = Provider.LOCAL;
     private String providerId;
 
 
+    @Builder.Default
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_role_mapping",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -50,8 +55,8 @@ public class User implements UserDetails {
         Instant now = Instant.now();
         if(createdAt == null) {
             createdAt = now;
-            updatedAt = now;
         }
+            updatedAt = now;
     }
 
     @PreUpdate

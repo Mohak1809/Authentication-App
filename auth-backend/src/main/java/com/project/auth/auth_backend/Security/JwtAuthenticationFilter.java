@@ -108,7 +108,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // e.printStackTrace();
 
             } catch (JwtException e) {
-                request.setAttribute("error", "Token Invalid");
+                request.setAttribute("error", "Token Invalid !!");
                 // e.printStackTrace();
 
             } catch (Exception e) {

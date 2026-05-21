@@ -62,7 +62,7 @@ public class AuthController {
         Authentication authenticate = authenticate(loginRequest);
         User user = userRepository.findByEmail(loginRequest.email())
                 .orElseThrow(() -> new BadCredentialsException("Invalid username or password"));
-        if (!user.getEnable() || user.getEnable() == null) {
+        if (!user.isEnabled()) {
             throw new DisabledException("User is disabled");
         }
 
@@ -161,7 +161,6 @@ public class AuthController {
 
     }
 
-
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletResponse response, HttpServletRequest request) {
         readRefreshTokenFromRequest(null, request).ifPresent(token -> {
@@ -172,7 +171,7 @@ public class AuthController {
                         rt.setRevoked(true);
                         refreshTokenRepository.save(rt);
                     });
-                    
+
                 }
             } catch (JwtException e) {
 
@@ -203,7 +202,6 @@ public class AuthController {
                 return fromCookie;
         }
 
-
         // 3. custom header
         String refreshHeader = request.getHeader("X-Refresh-Token");
         if (refreshHeader != null && !refreshHeader.isBlank()) {
@@ -231,6 +229,12 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<UserDto> registerUser(@RequestBody UserDto userDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.registerUser(userDto));
+    }
+
+
+    @PostMapping("/register/admin")
+    public ResponseEntity<UserDto> registerAdmin(@RequestBody UserDto userDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.registerAdmin(userDto));
     }
 
 }

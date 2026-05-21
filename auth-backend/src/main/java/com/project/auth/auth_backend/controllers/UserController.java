@@ -2,8 +2,10 @@ package com.project.auth.auth_backend.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import com.project.auth.auth_backend.config.AppConstants;
 import com.project.auth.auth_backend.dtos.UserDto;
 import com.project.auth.auth_backend.services.UserService;
 
@@ -20,6 +22,8 @@ public class UserController {
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(userDto));
     }
+
+    
 
     @GetMapping
     public ResponseEntity<Iterable<UserDto>> getAllUsers() {
@@ -42,9 +46,12 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(userDto, userId));
     }
 
+
+    // Alternate for the security config file
+    @PreAuthorize("hasRole('" + AppConstants.Role_ADMIN + "')")
     @GetMapping("/{userId}")
     public ResponseEntity<UserDto> getUserById(@PathVariable String userId) {
         return ResponseEntity.ok(userService.getUserById(userId));
     }
-    
+
 }
