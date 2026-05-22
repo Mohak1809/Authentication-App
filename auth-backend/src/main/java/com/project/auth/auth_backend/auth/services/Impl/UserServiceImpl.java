@@ -1,0 +1,148 @@
+package com.project.auth.auth_backend.auth.services.Impl;
+
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.UUID;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
+
+import com.project.auth.auth_backend.auth.config.AppConstants;
+import com.project.auth.auth_backend.auth.entities.Provider;
+import com.project.auth.auth_backend.auth.entities.Role;
+import com.project.auth.auth_backend.auth.entities.User;
+import com.project.auth.auth_backend.auth.helpers.Userhelper;
+import com.project.auth.auth_backend.auth.payload.UserDto;
+import com.project.auth.auth_backend.auth.repositories.RoleRepository;
+import com.project.auth.auth_backend.auth.repositories.UserRepository;
+import com.project.auth.auth_backend.auth.services.UserService;
+import com.project.auth.auth_backend.exceptions.ResourceNotFoundException;
+
+import jakarta.transaction.Transactional;
+import lombok.*;
+
+@Service
+@RequiredArgsConstructor
+public class UserServiceImpl implements UserService {
+
+    private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
+    private final RoleRepository roleRepository;
+
+    @Override
+    @Transactional
+    public UserDto createUser(UserDto userDto) {
+        if (userDto.getEmail() == null || userDto.getEmail().isBlank()) {
+            throw new IllegalArgumentException("Email is required");
+        }
+        if (userRepository.existsByEmail(userDto.getEmail())) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+
+        // model mapper lib is used to convert dto to entity and vice versa
+        User user = modelMapper.map(userDto, User.class);
+        if (user.getRoles() == null) {
+            user.setRoles(new HashSet<>());
+        }
+
+        user.setEnable(true);
+
+        user.setProvider(userDto.getProvider() != null ? userDto.getProvider() : Provider.LOCAL);
+        // TODO: role assign to user for authorization
+
+        // assign the default role
+        // Assign guest directly on default
+        Role role = roleRepository.findByName("ROLE_" + AppConstants.Role_GUEST).orElse(null);
+        user.getRoles().add(role);
+
+        User savedUser = userRepository.save(user);
+
+        return modelMapper.map(savedUser, UserDto.class);
+    }
+
+    @Override
+    @Transactional
+    public UserDto createAdmin(UserDto userDto) {
+        if (userDto.getEmail() == null || userDto.getEmail().isBlank()) {
+            throw new IllegalArgumentException("Email is required");
+        }
+        if (userRepository.existsByEmail(userDto.getEmail())) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+        User user = modelMapper.map(userDto, User.class);
+
+        if (user.getRoles() == null) {
+            user.setRoles(new HashSet<>());
+        }
+
+        user.setEnable(true);
+        user.setProvider(userDto.getProvider() != null ? userDto.getProvider() : Provider.LOCAL);
+        Role role = roleRepository.findByName("ROLE_" + AppConstants.Role_ADMIN).orElse(null);
+        user.getRoles().add(role);
+
+        User savedUser = userRepository.save(user);
+        return modelMapper.map(savedUser, UserDto.class);
+
+    }
+
+    @Override
+    public UserDto getUserByEmail(String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return modelMapper.map(user, UserDto.class);
+    }
+
+    @Override
+    public UserDto updateUser(UserDto userDto, String userId) {
+        UUID uId = Userhelper.parseUUID(userId);
+        User existUser = userRepository.findById(uId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with given id"));
+        if (userDto.getName() != null) {
+            existUser.setName(userDto.getName());
+        }
+
+        // TODO: change password update logic
+        if (userDto.getPassword() != null) {
+            existUser.setPassword(userDto.getPassword());
+        }
+        if (userDto.getImage() != null) {
+            existUser.setImage(userDto.getImage());
+        }
+        if (userDto.getProvider() != null) {
+            existUser.setProvider(userDto.getProvider());
+        }
+        existUser.setEnable(userDto.isEnable());
+        existUser.setUpdatedAt(Instant.now());
+        User updatedUser = userRepository.save(existUser);
+        return modelMapper.map(updatedUser, UserDto.class);
+    }
+
+    @Override
+    public void deleteUser(String userId) {
+        UUID uId = Userhelper.parseUUID(userId);
+        User user = userRepository.findById(uId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with given id"));
+        userRepository.delete(user);
+
+    }
+
+    @Override
+    public UserDto getUserById(String userId) {
+        User user = userRepository.findById(Userhelper.parseUUID(userId))
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with given id"));
+        return modelMapper.map(user, UserDto.class);
+    }
+
+    @Override
+    @Transactional
+    public Iterable<UserDto> getAllUsers() {
+
+        return userRepository
+                .findAll()
+                .stream()
+                .map(user -> modelMapper.map(user, UserDto.class))
+                .toList();
+    }
+
+}

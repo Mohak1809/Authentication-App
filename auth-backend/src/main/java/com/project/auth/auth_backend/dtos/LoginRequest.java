@@ -1,8 +1,0 @@
-package com.project.auth.auth_backend.dtos;
-
-public record LoginRequest(
-    String email,
-    String password
-) {
-
-}

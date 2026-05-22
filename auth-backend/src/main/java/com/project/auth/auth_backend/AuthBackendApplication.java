@@ -7,9 +7,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.project.auth.auth_backend.config.AppConstants;
-import com.project.auth.auth_backend.entities.Role;
-import com.project.auth.auth_backend.repositories.RoleRepository;
+import com.project.auth.auth_backend.auth.config.AppConstants;
+import com.project.auth.auth_backend.auth.entities.Role;
+import com.project.auth.auth_backend.auth.repositories.RoleRepository;
 
 @SpringBootApplication
 public class AuthBackendApplication implements CommandLineRunner {
